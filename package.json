@@ -9,6 +9,12 @@
   "bin": {
     "mcp-google-tag-manager": "./dist/index.js"
   },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "gtm",
+    "stape"
+  ],
   "scripts": {
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
     "build": "tsc && chmod 755 dist/index.js",
