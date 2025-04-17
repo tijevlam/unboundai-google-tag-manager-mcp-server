@@ -1,13 +1,13 @@
 {
-  "name": "mcp-google-tag-manager",
+  "name": "google-tag-manager-mcp-server",
   "version": "1.0.0",
   "description": "MCP server for Google Tag Manager",
   "license": "Apache-2.0",
   "author": "stape-io",
-  "homepage": "https://github.com/stape-io/mcp-google-tag-manager",
+  "homepage": "https://github.com/stape-io/google-tag-manager-mcp-server",
   "main": "dist/index.js",
   "bin": {
-    "mcp-google-tag-manager": "./dist/index.js"
+    "google-tag-manager-mcp-server": "./dist/index.js"
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",

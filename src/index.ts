@@ -10,7 +10,7 @@ const server = new McpServer({
   version: getPackageVersion(),
   protocolVersion: "1.0",
   vendor: "stape-io",
-  homepage: "https://github.com/stape-io/mcp-google-tag-manager",
+  homepage: "https://github.com/stape-io/google-tag-manager-mcp-server",
 });
 
 tools.forEach((register) => register(server));
