@@ -22,7 +22,6 @@ This is a MCP server that provides an interface to the Google Tag Manager API.
    GOOGLE_APPLICATION_CREDENTIALS=./path/to/your/service-account-key.json
    ```
 
-
 ## Error Handling
 
 The server includes basic error handling and will return appropriate HTTP status codes and error messages.
@@ -30,6 +29,7 @@ The server includes basic error handling and will return appropriate HTTP status
 ## Security
 
 Make sure to:
+
 - Keep your service account credentials secure
 - Never commit the service account key file to version control
 - Use environment variables for sensitive information 
