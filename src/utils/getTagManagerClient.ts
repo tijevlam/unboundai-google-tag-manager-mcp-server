@@ -4,13 +4,12 @@ import { log } from "./log";
 type TagManagerClient = ReturnType<typeof google.tagmanager>;
 
 // --- Helper function to obtain an authenticated TagManager client ---
-export async function getTagManagerClient(): Promise<TagManagerClient> {
+export async function getTagManagerClient(
+  scopes: string[],
+): Promise<TagManagerClient> {
   try {
     const auth = new google.auth.GoogleAuth({
-      scopes: [
-        "https://www.googleapis.com/auth/tagmanager.readonly",
-        "https://www.googleapis.com/auth/tagmanager.edit.containers",
-      ],
+      scopes,
       keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     });
 
