@@ -19,7 +19,7 @@ Replace the content with the following configuration. Once you restart Claude De
       "args": [
         "-y",
         "mcp-remote",
-        "${DOMAIN}/sse"
+        "https//gtm-mcp.stape.ai/sse"
       ]
     }
   }

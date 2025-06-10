@@ -2,7 +2,9 @@ name: Deploy
 
 on:
   push:
-    branches: main
+    branches: 
+    - main
+    - OPS-1022/deploy-gtm-mcp
   workflow_dispatch:
 
 jobs:
