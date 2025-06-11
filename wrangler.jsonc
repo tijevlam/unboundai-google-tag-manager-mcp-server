@@ -10,6 +10,12 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "routes": [
+    {
+      "pattern": "gtm-mcp.stape.ai",
+      "custom_domain": true
+    }
+  ],
   "migrations": [
     {
       "new_sqlite_classes": [
@@ -29,7 +35,7 @@
   "kv_namespaces": [
     {
       "binding": "OAUTH_KV",
-      "id": "<ID>"
+      "id": "c9e092f6b8864647bc2d73b00628c0d7"
     }
   ],
   "observability": {
