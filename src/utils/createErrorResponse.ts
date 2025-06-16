@@ -13,7 +13,7 @@ export function createErrorResponse(
       detailedMessage = `It seems that your token has been expired, please use ${TAG_MANAGER_REMOVE_MCP_SERVER_DATA} tool to clear your session in the MCP client`;
     } else {
       const messages = (error?.errors || []).map(
-        (item: { massage?: string }) => item?.massage,
+        (item: { message?: string }) => item?.message,
       );
 
       detailedMessage = `${message}: Google API Error ${error.code} - ${messages.join(". ")}`;
