@@ -8,6 +8,9 @@ import {
   getUpstreamAuthorizeUrl,
   Props,
 } from "./authorizeUtils";
+import { renderMainPage } from "./renderMainPage";
+import { renderPrivacyPage } from "./renderPrivacyPage";
+import { renderTermsPage } from "./renderTermsPage";
 import {
   clientIdAlreadyApproved,
   parseRedirectApproval,
@@ -188,6 +191,30 @@ app.get("/remove", async (c) => {
 
   return new Response("OK", {
     status: 200,
+  });
+});
+
+app.get("/", async () => {
+  return new Response(renderMainPage(), {
+    headers: {
+      "content-type": "text/html;charset=UTF-8",
+    },
+  });
+});
+
+app.get("/privacy", async () => {
+  return new Response(renderPrivacyPage(), {
+    headers: {
+      "content-type": "text/html;charset=UTF-8",
+    },
+  });
+});
+
+app.get("/terms", async () => {
+  return new Response(renderTermsPage(), {
+    headers: {
+      "content-type": "text/html;charset=UTF-8",
+    },
   });
 });
 
