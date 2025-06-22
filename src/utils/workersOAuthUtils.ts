@@ -287,7 +287,16 @@ export function renderApprovalDialog(
             --card-shadow: 0 8px 36px 8px rgba(0, 0, 0, 0.1);
           }
           
+          html {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+          }
+          
           body {
+            display: flex;
+            flex-direction: column;
+            flex: 1 0 auto;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                          Helvetica, Arial, sans-serif, "Apple Color Emoji",
                          "Segoe UI Emoji", "Segoe UI Symbol";
@@ -299,13 +308,16 @@ export function renderApprovalDialog(
           }
           
           .container {
+            display: flex;
+            flex-direction: column;
+            flex: 1 0 auto;
             max-width: 600px;
             margin: 2rem auto;
             padding: 1rem;
           }
           
           .precard {
-            padding: 2rem;
+            padding: 16px;
             text-align: center;
           }
           
@@ -335,6 +347,11 @@ export function renderApprovalDialog(
             margin: 0;
             font-size: 1.3rem;
             font-weight: 400;
+            
+            a {
+              text-decoration: none;
+              color: var(--text-color);
+            }
           }
           
           .alert {
@@ -420,6 +437,13 @@ export function renderApprovalDialog(
             color: var(--text-color);
           }
           
+          footer {
+            display: flex;
+            justify-content: center;
+            column-gap: 24px;
+            padding: 2rem 1rem;
+          }
+          
           /* Responsive adjustments */
           @media (max-width: 640px) {
             .container {
@@ -455,7 +479,11 @@ export function renderApprovalDialog(
           <div class="precard">
             <div class="header">
               ${logoUrl ? `<img src="${logoUrl}" alt="${serverName} Logo" class="logo">` : ""}
-            <h1 class="title"><strong>${serverName}</strong></h1>
+              <h1 class="title">
+                <a href="/">
+                  <strong>${serverName}</strong>
+                </a>
+              </h1>
             </div>
             
             ${serverDescription ? `<p class="description">${serverDescription}</p>` : ""}
@@ -545,8 +573,6 @@ export function renderApprovalDialog(
             
             <p>This MCP Client is requesting to be authorized on ${serverName}. If you approve, you will be redirected to complete authentication.</p>
             
-            <p>The use of raw or derived user data received from Workspace APIs will adhere to the Google User Data Policy, including the Limited Use requirements.</p>
-            
             <form method="post" action="${new URL(request.url).pathname}">
               <input type="hidden" name="state" value="${encodedState}">
               
@@ -557,6 +583,10 @@ export function renderApprovalDialog(
             </form>
           </div>
         </div>
+        <footer>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+        </footer>
       </body>
     </html>
   `;
