@@ -125,7 +125,7 @@ export const renderPrivacyPage = () => {
     
         <div class="highlight">
             <h2>Google API Compliance and Limited Use Requirements</h2>
-            <p><strong>This service complies with <a href="https://developers.google.com/terms/api-services-user-data-policy#additional-requirements-for-specific-api-scopes" target="_blank">Google's Limited Use requirements</a> for applications utilizing sensitive API scopes.</strong></p>
+            <p><strong>This service complies with <a href="https://developers.google.com/workspace/workspace-api-user-data-developer-policy#limited-use" target="_blank">Google's Limited Use requirements</a> for applications utilizing sensitive API scopes.</strong></p>
             
             <p><strong>Affirmative Compliance Statement:</strong><br>
             <em>"The use of raw or derived user data received from Workspace APIs will adhere to the Google User Data Policy, including the Limited Use requirements."</em></p>
