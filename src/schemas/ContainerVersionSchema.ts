@@ -1,16 +1,16 @@
 import { z } from "zod";
-import { BuiltInVariableSchemaFields } from "./BuiltInVariableSchema";
-import { ClientSchemaFields } from "./ClientSchema";
-import { CustomTemplateSchemaFields } from "./CustomTemplateSchema";
-import { FolderSchemaFields } from "./FolderSchema";
-import { GtagConfigSchemaFields } from "./GtagConfigSchema";
-import { TagSchemaFields } from "./TagSchema";
-import { TransformationSchemaFields } from "./TransformationSchema";
-import { TriggerSchemaFields } from "./TriggerSchema";
-import { VariableSchemaFields } from "./VariableSchema";
-import { ZoneSchemaFields } from "./ZoneSchema";
+import { BuiltInVariableSchema } from "./BuiltInVariableSchema";
+import { ClientSchema } from "./ClientSchema";
+import { CustomTemplateSchema } from "./CustomTemplateSchema";
+import { FolderSchema } from "./FolderSchema";
+import { GtagConfigSchema } from "./GtagConfigSchema";
+import { TagSchema } from "./TagSchema";
+import { TransformationSchema } from "./TransformationSchema";
+import { TriggerSchema } from "./TriggerSchema";
+import { VariableSchema } from "./VariableSchema";
+import { ZoneSchema } from "./ZoneSchema";
 
-export const ContainerVersionSchemaFields = {
+export const ContainerVersionSchema = z.object({
   accountId: z.string().optional().describe("GTM Account ID."),
   containerId: z.string().optional().describe("GTM Container ID."),
   containerVersionId: z
@@ -32,65 +32,59 @@ export const ContainerVersionSchemaFields = {
     .optional()
     .describe("The container that this version was taken from."),
   tag: z
-    .array(z.object(TagSchemaFields))
+    .array(TagSchema)
     .optional()
     .describe("The tags in the container that this version was taken from."),
   trigger: z
-    .array(z.object(TriggerSchemaFields))
+    .array(TriggerSchema)
     .optional()
     .describe(
       "The triggers in the container that this version was taken from.",
     ),
   variable: z
-    .array(z.object(VariableSchemaFields))
+    .array(VariableSchema)
     .optional()
     .describe(
       "The variables in the container that this version was taken from.",
     ),
   folder: z
-    .array(z.object(FolderSchemaFields))
+    .array(FolderSchema)
     .optional()
     .describe("The folders in the container that this version was taken from."),
   builtInVariable: z
-    .array(z.object(BuiltInVariableSchemaFields))
+    .array(BuiltInVariableSchema)
     .optional()
     .describe(
       "The built-in variables in the container that this version was taken from.",
-    ),
-  fingerprint: z
-    .string()
-    .optional()
-    .describe(
-      "The fingerprint of the GTM Container Version as computed at storage time.",
     ),
   tagManagerUrl: z
     .string()
     .optional()
     .describe("Auto generated link to the tag manager UI."),
   zone: z
-    .array(z.object(ZoneSchemaFields))
+    .array(ZoneSchema)
     .optional()
     .describe("The zones in the container that this version was taken from."),
   customTemplate: z
-    .array(z.object(CustomTemplateSchemaFields))
+    .array(CustomTemplateSchema)
     .optional()
     .describe(
       "The custom templates in the container that this version was taken from.",
     ),
   client: z
-    .array(z.object(ClientSchemaFields))
+    .array(ClientSchema)
     .optional()
     .describe("The clients in the container that this version was taken from."),
   gtagConfig: z
-    .array(z.object(GtagConfigSchemaFields))
+    .array(GtagConfigSchema)
     .optional()
     .describe(
       "The Google tag configs in the container that this version was taken from.",
     ),
   transformation: z
-    .array(z.object(TransformationSchemaFields))
+    .array(TransformationSchema)
     .optional()
     .describe(
       "The transformations in the container that this version was taken from.",
     ),
-};
+});

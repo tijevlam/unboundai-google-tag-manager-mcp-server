@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { ConditionSchema } from "./ConditionSchema";
 import { ParameterSchema } from "./ParameterSchema";
 
-export const TriggerSchemaFields = {
+export const TriggerSchema = z.object({
   accountId: z.string().describe("GTM Account ID."),
   containerId: z.string().describe("GTM Container ID."),
   workspaceId: z.string().describe("GTM Workspace ID."),
@@ -10,25 +9,38 @@ export const TriggerSchemaFields = {
     .string()
     .optional()
     .describe("The Trigger ID uniquely identifies the GTM Trigger."),
-  name: z.string().optional().describe("Trigger display name."),
-  type: z
+  fingerprint: z
     .string()
     .optional()
-    .describe("Defines the data layer event that causes this trigger."),
-  customEventFilter: z
-    .array(ConditionSchema)
-    .optional()
     .describe(
-      "Used in the case of custom event, which is fired iff all Conditions are true.",
+      "The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.",
     ),
+  name: z.string().optional().describe("Trigger display name."),
+  type: z.string().optional().describe("Trigger type."),
   filter: z
-    .array(ConditionSchema)
+    .array(ParameterSchema)
     .optional()
-    .describe("The trigger will only fire iff all Conditions are true."),
+    .describe("The trigger's filter conditions."),
   autoEventFilter: z
-    .array(ConditionSchema)
+    .array(ParameterSchema)
     .optional()
-    .describe("Used in the case of auto event tracking."),
+    .describe("The trigger's auto event filter conditions."),
+  customEventFilter: z
+    .array(ParameterSchema)
+    .optional()
+    .describe("The trigger's custom event filter conditions."),
+  tagManagerUrl: z
+    .string()
+    .optional()
+    .describe("Auto generated link to the tag manager UI."),
+  notes: z
+    .string()
+    .optional()
+    .describe("User notes on how to apply this trigger in the container."),
+  parameter: z
+    .array(ParameterSchema)
+    .optional()
+    .describe("Additional parameters for the trigger."),
   waitForTags: ParameterSchema.optional().describe(
     "Whether or not to delay form submissions or link opening until all of the tags have fired. Only valid for Form Submission and Link Click triggers.",
   ),
@@ -50,12 +62,6 @@ export const TriggerSchemaFields = {
   limit: ParameterSchema.optional().describe(
     "Limit of the number of GTM events this Timer Trigger will fire. Only valid for Timer triggers.",
   ),
-  fingerprint: z
-    .string()
-    .optional()
-    .describe(
-      "The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.",
-    ),
   parentFolderId: z.string().optional().describe("Parent folder id."),
   selector: ParameterSchema.optional().describe(
     "A click trigger CSS selector. Only valid for AMP Click trigger.",
@@ -87,16 +93,4 @@ export const TriggerSchemaFields = {
   totalTimeMinMilliseconds: ParameterSchema.optional().describe(
     "A visibility trigger minimum total visible time (ms). Only valid for AMP Visibility trigger.",
   ),
-  tagManagerUrl: z
-    .string()
-    .optional()
-    .describe("Auto generated link to the tag manager UI."),
-  notes: z
-    .string()
-    .optional()
-    .describe("User notes on how to apply this trigger in the container."),
-  parameter: z
-    .array(ParameterSchema)
-    .optional()
-    .describe("Additional parameters for the trigger."),
-};
+});

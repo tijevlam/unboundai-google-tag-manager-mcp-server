@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ParameterSchema } from "./ParameterSchema";
 
 /**
- * Tag resource schema fields (writable fields only)
+ * Tag resource schema fields (all fields, including IDs and metadata)
  * https://developers.google.com/tag-platform/tag-manager/api/reference/rest/v2/accounts.containers.workspaces.tags#Tag
  */
 const ConsentSettingSchema = z.object({
@@ -44,7 +44,7 @@ const TagFiringOptionEnum = z.enum([
   "oncePerLoad",
 ]);
 
-export const TagSchemaFields = {
+export const TagSchema = z.object({
   accountId: z.string().describe("GTM Account ID."),
   containerId: z.string().describe("GTM Container ID."),
   workspaceId: z.string().describe("GTM Workspace ID."),
@@ -52,6 +52,12 @@ export const TagSchemaFields = {
     .string()
     .optional()
     .describe("The Tag ID uniquely identifies the GTM Tag."),
+  fingerprint: z
+    .string()
+    .optional()
+    .describe(
+      "The fingerprint of the GTM Tag as computed at storage time. This value is recomputed whenever the tag is modified.",
+    ),
   name: z.string().optional().describe("Tag display name."),
   type: z.string().optional().describe("GTM Tag Type."),
   liveOnly: z
@@ -79,12 +85,6 @@ export const TagSchemaFields = {
     .array(ParameterSchema)
     .optional()
     .describe("The tag's parameters."),
-  fingerprint: z
-    .string()
-    .optional()
-    .describe(
-      "The fingerprint of the GTM Tag as computed at storage time. This value is recomputed whenever the tag is modified.",
-    ),
   firingTriggerId: z
     .array(z.string())
     .optional()
@@ -134,4 +134,4 @@ export const TagSchemaFields = {
   consentSettings: ConsentSettingSchema.optional().describe(
     "Consent settings of a tag.",
   ),
-};
+});

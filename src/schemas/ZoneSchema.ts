@@ -39,7 +39,8 @@ const TypeRestrictionSchema = z.object({
     ),
 });
 
-export const ZoneSchemaFields = {
+// Clean schema for merged tools (writable fields only)
+export const ZoneSchema = z.object({
   accountId: z.string().describe("GTM Account ID."),
   containerId: z.string().describe("GTM Container ID."),
   workspaceId: z.string().describe("GTM Workspace ID."),
@@ -47,7 +48,6 @@ export const ZoneSchemaFields = {
     .string()
     .optional()
     .describe("The Zone ID uniquely identifies the GTM Zone."),
-  name: z.string().optional().describe("Zone display name."),
   fingerprint: z
     .string()
     .optional()
@@ -58,16 +58,15 @@ export const ZoneSchemaFields = {
     .string()
     .optional()
     .describe("Auto generated link to the tag manager UI."),
-  notes: z
-    .string()
-    .optional()
-    .describe("User notes on how to apply this zone in the container."),
+  name: z.string().optional().describe("Zone display name."),
+  type: z.string().optional().describe("Zone type."),
   childContainer: z
     .array(ChildContainerSchema)
     .optional()
-    .describe("Containers that are children of this Zone."),
+    .describe("Child containers for the zone."),
+  notes: z.string().optional().describe("Zone notes."),
   boundary: BoundarySchema.optional().describe("This Zone's boundary."),
   typeRestriction: TypeRestrictionSchema.optional().describe(
     "This Zone's type restrictions.",
   ),
-};
+});

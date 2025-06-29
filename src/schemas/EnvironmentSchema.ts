@@ -7,22 +7,22 @@ export const EnvironmentTypeEnum = z.enum([
   "workspace",
 ]);
 
-export const EnvironmentSchemaFields = {
+export const EnvironmentSchema = z.object({
   accountId: z.string().describe("GTM Account ID."),
   containerId: z.string().describe("GTM Container ID."),
   environmentId: z
     .string()
     .optional()
     .describe("GTM Environment ID uniquely identifies the GTM Environment."),
-  type: EnvironmentTypeEnum.optional().describe(
-    "The type of this environment.",
-  ),
   fingerprint: z
     .string()
     .optional()
     .describe(
       "The fingerprint of the GTM environment as computed at storage time.",
     ),
+  type: EnvironmentTypeEnum.optional().describe(
+    "The type of this environment.",
+  ),
   name: z
     .string()
     .optional()
@@ -65,4 +65,4 @@ export const EnvironmentSchemaFields = {
     .string()
     .optional()
     .describe("Represents a link to a quick preview of a workspace."),
-};
+});

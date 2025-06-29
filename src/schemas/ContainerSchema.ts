@@ -65,12 +65,18 @@ export const ContainerFeaturesSchema = z.object({
     .describe("Whether this Container supports transformations."),
 });
 
-export const ContainerSchemaFields = {
+export const ContainerSchema = z.object({
   accountId: z.string().describe("GTM Account ID."),
   containerId: z
     .string()
     .optional()
     .describe("The Container ID uniquely identifies the GTM Container."),
+  fingerprint: z
+    .string()
+    .optional()
+    .describe(
+      "The fingerprint of the GTM Container as computed at storage time.",
+    ),
   name: z.string().optional().describe("Container display name."),
   domainName: z
     .array(z.string())
@@ -102,12 +108,6 @@ export const ContainerSchemaFields = {
     .describe(
       "List of Usage Contexts for the Container. Valid values include: web, android, or ios.",
     ),
-  fingerprint: z
-    .string()
-    .optional()
-    .describe(
-      "The fingerprint of the GTM Container as computed at storage time.",
-    ),
   tagManagerUrl: z
     .string()
     .optional()
@@ -116,4 +116,4 @@ export const ContainerSchemaFields = {
     .array(z.string())
     .optional()
     .describe("List of server-side container URLs for the Container."),
-};
+});
