@@ -2,8 +2,6 @@
 
 This is a server that supports remote MCP connections, with Google OAuth built-in and provides an interface to the Google Tag Manager API.
 
-## Prerequisites
-- Node.js (v18 or higher)
 
 ## Access the remote MCP server from Claude Desktop
 
