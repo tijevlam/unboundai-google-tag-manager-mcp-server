@@ -1,41 +1,41 @@
-import { accountTools } from "./accounts";
-import { builtInVariablesTools } from "./built-in-variables";
-import { clientTools } from "./clients";
-import { containerTools } from "./containers";
-import { destinationTools } from "./destinations";
-import { environmentTools } from "./environments";
-import { folderTools } from "./folders";
-import { gtagConfigTools } from "./gtag-config";
+import { accountActions } from "./accountActions";
+import { builtInVariableActions } from "./builtInVariableActions";
+import { clientActions } from "./clientActions";
+import { containerActions } from "./containerActions";
+import { destinationActions } from "./destinationActions";
+import { environmentActions } from "./environmentActions";
+import { folderActions } from "./folderActions";
+import { gtagConfigActions } from "./gtagConfigActions";
 import { removeMCPServerData } from "./removeMCPServerData";
-import { tagTools } from "./tags";
-import { templateTools } from "./templates";
-import { transformationTools } from "./transformations";
-import { triggerTools } from "./triggers";
-import { userPermissionTools } from "./user-permissions";
-import { variableTools } from "./variables";
-import { versionHeadersTools } from "./version-headers";
-import { versionTools } from "./versions";
-import { workspaceTools } from "./workspaces";
-import { zoneTools } from "./zones";
+import { tagActions } from "./tagActions";
+import { templateActions } from "./templateActions";
+import { transformationActions } from "./transformationActions";
+import { triggerActions } from "./triggerActions";
+import { userPermissionActions } from "./userPermissionActions";
+import { variableActions } from "./variableActions";
+import { versionHeaderActions } from "./versionHeaderActions";
+import { versionActions } from "./versionActions";
+import { workspaceActions } from "./workspaceActions";
+import { zoneActions } from "./zoneActions";
 
 export const tools = [
-  ...accountTools,
-  ...containerTools,
-  ...destinationTools,
-  ...environmentTools,
-  ...versionHeadersTools,
-  ...versionTools,
-  ...workspaceTools,
-  ...builtInVariablesTools,
-  ...clientTools,
-  ...folderTools,
-  ...gtagConfigTools,
-  ...templateTools,
-  ...tagTools,
-  ...transformationTools,
-  ...triggerTools,
-  ...variableTools,
-  ...zoneTools,
-  ...userPermissionTools,
+  accountActions,
+  builtInVariableActions,
+  clientActions,
+  containerActions,
+  destinationActions,
+  environmentActions,
+  folderActions,
+  gtagConfigActions,
+  tagActions,
+  templateActions,
+  transformationActions,
+  triggerActions,
+  userPermissionActions,
+  variableActions,
+  versionHeaderActions,
+  versionActions,
+  workspaceActions,
+  zoneActions,
   removeMCPServerData,
 ];

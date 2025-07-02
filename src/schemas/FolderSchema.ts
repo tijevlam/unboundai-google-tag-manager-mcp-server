@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const FolderSchemaFields = {
+export const FolderSchema = z.object({
   accountId: z.string().describe("GTM Account ID."),
   containerId: z.string().describe("GTM Container ID."),
   workspaceId: z.string().describe("GTM Workspace ID."),
@@ -8,13 +8,13 @@ export const FolderSchemaFields = {
     .string()
     .optional()
     .describe("The Folder ID uniquely identifies the GTM Folder."),
-  name: z.string().optional().describe("Folder display name."),
   fingerprint: z
     .string()
     .optional()
     .describe(
       "The fingerprint of the GTM Folder as computed at storage time. This value is recomputed whenever the folder is modified.",
     ),
+  name: z.string().optional().describe("Folder display name."),
   tagManagerUrl: z
     .string()
     .optional()
@@ -23,4 +23,4 @@ export const FolderSchemaFields = {
     .string()
     .optional()
     .describe("User notes on how to apply this folder in the container."),
-};
+});

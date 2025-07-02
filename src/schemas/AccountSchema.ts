@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const FeaturesSchema = z.object({
+const FeaturesSchema = z.object({
   supportUserPermissions: z
     .boolean()
     .optional()
@@ -11,23 +11,20 @@ export const FeaturesSchema = z.object({
     .describe("Whether this Account supports multiple Containers."),
 });
 
-export const AccountSchemaFields = {
-  accountId: z
+export const AccountSchema = z.object({
+  accountId: z.string().describe("GTM Account ID."),
+  fingerprint: z
     .string()
     .optional()
-    .describe("The Account ID uniquely identifies the GTM Account."),
+    .describe(
+      "The fingerprint of the GTM Account as computed at storage time.",
+    ),
   name: z.string().optional().describe("Account display name."),
   shareData: z
     .boolean()
     .optional()
     .describe(
       "Whether the account shares data anonymously with Google and others.",
-    ),
-  fingerprint: z
-    .string()
-    .optional()
-    .describe(
-      "The fingerprint of the GTM Account as computed at storage time.",
     ),
   tagManagerUrl: z
     .string()
@@ -36,4 +33,4 @@ export const AccountSchemaFields = {
   features: FeaturesSchema.optional().describe(
     "Read-only Account feature set.",
   ),
-};
+});

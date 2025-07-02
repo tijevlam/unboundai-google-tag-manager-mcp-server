@@ -33,14 +33,7 @@ const ContainerAccessSchema = z.object({
   ),
 });
 
-export const UserPermissionSchemaFields = {
-  accountId: z
-    .string()
-    .describe("The Account ID uniquely identifies the GTM Account."),
-  userPermissionId: z
-    .string()
-    .optional()
-    .describe("The User Permission ID uniquely identifies the GTM Account."),
+export const UserPermissionSchema = z.object({
   emailAddress: z.string().describe("User's email address."),
   accountAccess: AccountAccessSchema.optional().describe(
     "GTM Account access permissions.",
@@ -49,4 +42,4 @@ export const UserPermissionSchemaFields = {
     .array(ContainerAccessSchema)
     .optional()
     .describe("GTM Container access permissions."),
-};
+});

@@ -2,17 +2,23 @@ import { z } from "zod";
 import { ParameterSchema } from "./ParameterSchema";
 
 /**
- * Client resource schema fields (writable fields only)
+ * Client resource schema fields (all fields, including IDs and metadata)
  * https://developers.google.com/tag-platform/tag-manager/api/reference/rest/v2/accounts.containers.workspaces.clients#Client
  */
-export const ClientSchemaFields = {
+export const ClientSchema = z.object({
   accountId: z.string().describe("GTM Account ID."),
   containerId: z.string().describe("GTM Container ID."),
   workspaceId: z.string().describe("GTM Workspace ID."),
   clientId: z
     .string()
     .optional()
-    .describe("The Client ID uniquely identifies the GTM client."),
+    .describe("The Client ID uniquely identifies the GTM Client."),
+  fingerprint: z
+    .string()
+    .optional()
+    .describe(
+      "The fingerprint of the GTM Client as computed at storage time. This value is recomputed whenever the client is modified.",
+    ),
   name: z.string().optional().describe("Client display name."),
   type: z.string().optional().describe("Client type."),
   parameter: z
@@ -23,12 +29,6 @@ export const ClientSchemaFields = {
     .number()
     .optional()
     .describe("Priority determines relative firing order."),
-  fingerprint: z
-    .string()
-    .optional()
-    .describe(
-      "The fingerprint of the GTM Client as computed at storage time. This value is recomputed whenever the client is modified.",
-    ),
   tagManagerUrl: z
     .string()
     .optional()
@@ -38,4 +38,4 @@ export const ClientSchemaFields = {
     .string()
     .optional()
     .describe("User notes on how to apply this tag in the container."),
-};
+});

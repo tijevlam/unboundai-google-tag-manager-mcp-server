@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { TAG_MANAGER_REMOVE_MCP_SERVER_DATA } from '../constants/tools';
+import { TAG_MANAGER_REMOVE_MCP_SERVER_DATA } from "../constants/tools";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { createErrorResponse } from "../utils";
 
@@ -9,7 +9,7 @@ export const removeMCPServerData = (
 ): void => {
   server.tool(
     TAG_MANAGER_REMOVE_MCP_SERVER_DATA,
-    "Remove client data from MCP server and revoke google auth access",
+    "Clear client data from MCP server and revoke google auth access",
     async () => {
       const url = new URL("remove", env.WORKER_HOST);
 

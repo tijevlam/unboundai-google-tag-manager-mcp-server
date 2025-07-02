@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const BuiltInVariableSchemaFields = {
+export const BuiltInVariableSchema = z.object({
   type: z.string().optional().describe("Type of built-in variable."),
   name: z
     .string()
@@ -10,4 +10,4 @@ export const BuiltInVariableSchemaFields = {
     .string()
     .optional()
     .describe("User notes on how to apply this variable in tagging scenarios."),
-};
+});

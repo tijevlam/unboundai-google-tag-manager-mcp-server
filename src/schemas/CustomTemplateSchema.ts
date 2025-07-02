@@ -41,7 +41,7 @@ export const GalleryReferenceSchema = z.object({
     ),
 });
 
-export const CustomTemplateSchemaFields = {
+export const CustomTemplateSchema = z.object({
   accountId: z.string().describe("GTM Account ID."),
   containerId: z.string().describe("GTM Container ID."),
   workspaceId: z.string().describe("GTM Workspace ID."),
@@ -51,13 +51,13 @@ export const CustomTemplateSchemaFields = {
     .describe(
       "The Custom Template ID uniquely identifies the GTM custom template.",
     ),
-  name: z.string().optional().describe("Custom Template display name."),
   fingerprint: z
     .string()
     .optional()
     .describe(
       "The fingerprint of the GTM Custom Template as computed at storage time. This value is recomputed whenever the template is modified.",
     ),
+  name: z.string().optional().describe("Custom Template display name."),
   tagManagerUrl: z
     .string()
     .optional()
@@ -69,4 +69,4 @@ export const CustomTemplateSchemaFields = {
   galleryReference: GalleryReferenceSchema.optional().describe(
     "A reference to the Community Template Gallery entry.",
   ),
-};
+});
