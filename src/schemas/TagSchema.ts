@@ -119,12 +119,9 @@ export const TagSchema = z.object({
     .describe(
       "Indicates whether the tag is paused, which prevents the tag from firing.",
     ),
-  monitoringMetadata: z
-    .object(ParameterSchema.shape)
-    .optional()
-    .describe(
-      "A map of key-value pairs of tag metadata to be included in the event data for tag monitoring.",
-    ),
+  monitoringMetadata: ParameterSchema.optional().describe(
+    "A map of key-value pairs of tag metadata to be included in the event data for tag monitoring.",
+  ),
   monitoringMetadataTagNameKey: z
     .string()
     .optional()

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { BuiltInVariableSchema } from "./BuiltInVariableSchema";
 import { ClientSchema } from "./ClientSchema";
+import { ContainerSchema } from "./ContainerSchema";
 import { CustomTemplateSchema } from "./CustomTemplateSchema";
 import { FolderSchema } from "./FolderSchema";
 import { GtagConfigSchema } from "./GtagConfigSchema";
@@ -27,10 +28,9 @@ export const ContainerVersionSchema = z.object({
       "A value of true indicates this container version has been deleted.",
     ),
   description: z.string().optional().describe("Container version description."),
-  container: z
-    .any()
-    .optional()
-    .describe("The container that this version was taken from."),
+  container: ContainerSchema.optional().describe(
+    "The container that this version was taken from.",
+  ),
   tag: z
     .array(TagSchema)
     .optional()
