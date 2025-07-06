@@ -19,7 +19,7 @@ export const variableActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_variable",
+    "gtm_variable",
     "Performs all GTM variable operations: create, get, list, update, remove, revert. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -70,7 +70,7 @@ export const variableActions = (
       fingerprint,
       pageToken,
     }) => {
-      log(`Running tool: tag_manager_variable with action ${action}`);
+      log(`Running tool: gtm_variable with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

@@ -17,7 +17,7 @@ export const versionActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_version",
+    "gtm_version",
     "Performs all container version operations: get, live, publish, remove, setLatest, undelete, update. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -65,7 +65,7 @@ export const versionActions = (
       createOrUpdateConfig,
       fingerprint,
     }) => {
-      log(`Running tool: tag_manager_version with action ${action}`);
+      log(`Running tool: gtm_version with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

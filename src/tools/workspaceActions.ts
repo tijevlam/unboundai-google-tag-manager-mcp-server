@@ -42,7 +42,7 @@ export const workspaceActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_workspace_actions",
+    "gtm_workspace",
     "Performs various workspace operations including create, get, list, update, remove, createVersion, getStatus, sync, quickPreview, and resolveConflict actions.",
     {
       action: z
@@ -105,7 +105,7 @@ export const workspaceActions = (
       changeStatus,
     }): Promise<CallToolResult> => {
       log(
-        `Running tool: tag_manager_workspace_actions for action '${action}' on account ${accountId}, container ${containerId}${
+        `Running tool: gtm_workspace for action '${action}' on account ${accountId}, container ${containerId}${
           workspaceId ? `, workspace ${workspaceId}` : ""
         }`,
       );

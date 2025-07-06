@@ -8,7 +8,7 @@ export const destinationActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_destination",
+    "gtm_destination",
     "Performs all destination operations: get, list, link, unlink. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -46,7 +46,7 @@ export const destinationActions = (
       destinationId,
       allowUserPermissionFeatureUpdate,
     }) => {
-      log(`Running tool: tag_manager_destination with action ${action}`);
+      log(`Running tool: gtm_destination with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

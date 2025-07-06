@@ -8,7 +8,7 @@ export const builtInVariableActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_built_in_variable",
+    "gtm_built_in_variable",
     "Performs all built-in variable operations: create, list, remove, revert. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -57,7 +57,7 @@ export const builtInVariableActions = (
       type,
       pageToken,
     }) => {
-      log(`Running tool: tag_manager_built_in_variable with action ${action}`);
+      log(`Running tool: gtm_built_in_variable with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

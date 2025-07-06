@@ -20,7 +20,7 @@ export const zoneActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_zone_actions",
+    "gtm_zone",
     "Performs various zone operations including create, get, list, update, remove, and revert actions.",
     {
       action: z
@@ -63,7 +63,7 @@ export const zoneActions = (
       fingerprint,
     }): Promise<CallToolResult> => {
       log(
-        `Running tool: tag_manager_zone_actions for action '${action}' on account ${accountId}, container ${containerId}, workspace ${workspaceId}${
+        `Running tool: gtm_zone for action '${action}' on account ${accountId}, container ${containerId}, workspace ${workspaceId}${
           zoneId ? `, zone ${zoneId}` : ""
         }`,
       );

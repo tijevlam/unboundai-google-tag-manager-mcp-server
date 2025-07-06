@@ -19,7 +19,7 @@ export const gtagConfigActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_gtag_config",
+    "gtm_gtag_config",
     "Performs all Google tag config operations: create, get, list, update, remove. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -72,7 +72,7 @@ export const gtagConfigActions = (
       fingerprint,
       pageToken,
     }) => {
-      log(`Running tool: tag_manager_gtag_config with action ${action}`);
+      log(`Running tool: gtm_gtag_config with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

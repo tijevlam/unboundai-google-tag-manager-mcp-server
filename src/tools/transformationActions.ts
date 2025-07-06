@@ -19,7 +19,7 @@ export const transformationActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_transformation",
+    "gtm_transformation",
     "Performs all GTM transformation operations: create, get, list, update, remove, revert. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -72,7 +72,7 @@ export const transformationActions = (
       fingerprint,
       pageToken,
     }) => {
-      log(`Running tool: tag_manager_transformation with action ${action}`);
+      log(`Running tool: gtm_transformation with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

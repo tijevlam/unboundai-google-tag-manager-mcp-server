@@ -16,7 +16,7 @@ export const environmentActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_environment",
+    "gtm_environment",
     "Performs all environment operations: create, get, list, update, remove, reauthorize. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -63,7 +63,7 @@ export const environmentActions = (
       fingerprint,
       pageToken,
     }) => {
-      log(`Running tool: tag_manager_environment with action ${action}`);
+      log(`Running tool: gtm_environment with action ${action}`);
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);
         switch (action) {

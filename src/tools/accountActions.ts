@@ -13,7 +13,7 @@ export const accountActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_account",
+    "gtm_account",
     "Performs all account-related operations: get, list, update. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -27,7 +27,7 @@ export const accountActions = (
       ),
     },
     async ({ action, accountId, config }) => {
-      log(`Running tool: tag_manager_account with action ${action}`);
+      log(`Running tool: gtm_account with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);
