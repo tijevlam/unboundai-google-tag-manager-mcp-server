@@ -19,7 +19,7 @@ export const triggerActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_trigger",
+    "gtm_trigger",
     "Performs all GTM trigger operations: create, get, list, update, remove, revert. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -66,7 +66,7 @@ export const triggerActions = (
       fingerprint,
       pageToken,
     }) => {
-      log(`Running tool: tag_manager_trigger with action ${action}`);
+      log(`Running tool: gtm_trigger with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

@@ -19,7 +19,7 @@ export const folderActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_folder",
+    "gtm_folder",
     "Performs all folder operations: create, get, list, update, remove, revert, entities, moveEntitiesToFolder. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -98,7 +98,7 @@ export const folderActions = (
       triggerId,
       variableId,
     }) => {
-      log(`Running tool: tag_manager_folder with action ${action}`);
+      log(`Running tool: gtm_folder with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

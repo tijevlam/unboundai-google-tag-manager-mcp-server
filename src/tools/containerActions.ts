@@ -26,7 +26,7 @@ export const containerActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_container",
+    "gtm_container",
     "Performs all container-related operations: create, get, update, remove, list, combine, lookup, moveTagId, snippet. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -90,7 +90,7 @@ export const containerActions = (
       combineConfig,
       moveTagIdConfig,
     }) => {
-      log(`Running tool: tag_manager_container with action ${action}`);
+      log(`Running tool: gtm_container with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

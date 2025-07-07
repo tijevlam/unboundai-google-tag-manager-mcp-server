@@ -19,7 +19,7 @@ export const templateActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_template",
+    "gtm_template",
     "Performs all GTM custom template operations: create, get, list, update, remove, revert. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -72,7 +72,7 @@ export const templateActions = (
       fingerprint,
       pageToken,
     }) => {
-      log(`Running tool: tag_manager_template with action ${action}`);
+      log(`Running tool: gtm_template with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

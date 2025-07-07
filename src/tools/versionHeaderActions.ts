@@ -8,7 +8,7 @@ export const versionHeaderActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_version_header",
+    "gtm_version_header",
     "Performs all container version header operations: list, latest. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -32,7 +32,7 @@ export const versionHeaderActions = (
         .describe("A token for pagination. Optional for 'list' action."),
     },
     async ({ action, accountId, containerId, includeDeleted, pageToken }) => {
-      log(`Running tool: tag_manager_version_header with action ${action}`);
+      log(`Running tool: gtm_version_header with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

@@ -11,7 +11,7 @@ export const userPermissionActions = (
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
-    "tag_manager_user_permission",
+    "gtm_user_permission",
     "Performs all user permission operations: create, get, list, update, remove. Use the 'action' parameter to select the operation.",
     {
       action: z
@@ -45,7 +45,7 @@ export const userPermissionActions = (
       createOrUpdateConfig,
       pageToken,
     }) => {
-      log(`Running tool: tag_manager_user_permission with action ${action}`);
+      log(`Running tool: gtm_user_permission with action ${action}`);
 
       try {
         const tagmanager = await getTagManagerClient(props.accessToken);

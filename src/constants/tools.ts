@@ -1,2 +1,1 @@
-export const TAG_MANAGER_REMOVE_MCP_SERVER_DATA =
-  "tag_manager_remove_mcp_server_data";
+export const TAG_MANAGER_REMOVE_MCP_SERVER_DATA = "gtm_remove_session";
