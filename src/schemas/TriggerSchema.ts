@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ConditionSchema } from "./ConditionSchema";
 import { ParameterSchema } from "./ParameterSchema";
 
 export const TriggerSchema = z.object({
@@ -18,15 +19,15 @@ export const TriggerSchema = z.object({
   name: z.string().optional().describe("Trigger display name."),
   type: z.string().optional().describe("Trigger type."),
   filter: z
-    .array(ParameterSchema)
+    .array(ConditionSchema)
     .optional()
     .describe("The trigger's filter conditions."),
   autoEventFilter: z
-    .array(ParameterSchema)
+    .array(ConditionSchema)
     .optional()
     .describe("The trigger's auto event filter conditions."),
   customEventFilter: z
-    .array(ParameterSchema)
+    .array(ConditionSchema)
     .optional()
     .describe("The trigger's custom event filter conditions."),
   tagManagerUrl: z
