@@ -1,4 +1,5 @@
 # MCP Server for Google Tag Manager
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/stape-io/google-tag-manager-mcp-server)](https://archestra.ai/mcp-catalog/stape-io__google-tag-manager-mcp-server)
 
 This is a server that supports remote MCP connections, with Google OAuth built-in and provides an interface to the Google Tag Manager API.
 
