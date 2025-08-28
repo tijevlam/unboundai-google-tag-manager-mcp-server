@@ -1,10 +1,17 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { CombineConfigSchema } from "../schemas/CombineConfigSchema";
 import { ContainerSchema } from "../schemas/ContainerSchema";
 import { MoveTagIdConfigSchema } from "../schemas/MoveTagIdConfigSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
+import Schema$Container = tagmanager_v2.Schema$Container;
 
 const ContainerPayloadSchema = ContainerSchema.omit({
   accountId: true,
@@ -21,13 +28,15 @@ const CombineConfigPayloadSchema = CombineConfigSchema.omit({
   accountId: true,
 });
 
+const ITEMS_PER_PAGE = 50;
+
 export const containerActions = (
   server: McpServer,
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_container",
-    "Performs all container-related operations: create, get, update, remove, list, combine, lookup, moveTagId, snippet. Use the 'action' parameter to select the operation.",
+    `Performs all container-related operations: create, get, update, remove, list, combine, lookup, moveTagId, snippet. The 'list' action returns up to itemsPerPage items per page.`,
     {
       action: z
         .enum([
@@ -62,10 +71,6 @@ export const containerActions = (
       createOrUpdateConfig: ContainerPayloadSchema.optional().describe(
         "Configuration for 'create' and 'update' actions. All fields correspond to the GTM Container resource.",
       ),
-      pageToken: z
-        .string()
-        .optional()
-        .describe("A token for pagination. Optional for 'list' action."),
       fingerprint: z
         .string()
         .optional()
@@ -78,6 +83,21 @@ export const containerActions = (
       moveTagIdConfig: MoveTagIdConfigPayloadSchema.optional().describe(
         "Configuration for 'moveTagId' action. Specifies tag ID mapping for moving tags between containers.",
       ),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
+        ),
     },
     async ({
       action,
@@ -85,10 +105,11 @@ export const containerActions = (
       containerId,
       destinationId,
       createOrUpdateConfig,
-      pageToken,
       fingerprint,
       combineConfig,
       moveTagIdConfig,
+      page,
+      itemsPerPage,
     }) => {
       log(`Running tool: gtm_container with action ${action}`);
 
@@ -190,13 +211,30 @@ export const containerActions = (
               throw new Error(`accountId is required for ${action} action`);
             }
 
-            const response = await tagmanager.accounts.containers.list({
-              parent: `accounts/${accountId}`,
-              pageToken,
-            });
+            let all: Schema$Container[] = [];
+            let currentPageToken = "";
+
+            do {
+              const response = await tagmanager.accounts.containers.list({
+                parent: `accounts/${accountId}`,
+                pageToken: currentPageToken,
+              });
+
+              if (response.data.container) {
+                all = all.concat(response.data.container);
+              }
+
+              currentPageToken = response.data.nextPageToken || "";
+            } while (currentPageToken);
+
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
+
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }

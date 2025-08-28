@@ -4,7 +4,12 @@ import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { ZoneSchema } from "../schemas/ZoneSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
 import Schema$Zone = tagmanager_v2.Schema$Zone;
 
 const PayloadSchema = ZoneSchema.omit({
@@ -15,13 +20,15 @@ const PayloadSchema = ZoneSchema.omit({
   fingerprint: true,
 });
 
+const ITEMS_PER_PAGE = 20;
+
 export const zoneActions = (
   server: McpServer,
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_zone",
-    "Performs various zone operations including create, get, list, update, remove, and revert actions.",
+    `Performs various zone operations including create, get, list, update, remove, and revert actions. The 'list' action returns up to ${ITEMS_PER_PAGE} items per page.`,
     {
       action: z
         .enum(["create", "get", "list", "update", "remove", "revert"])
@@ -52,6 +59,21 @@ export const zoneActions = (
         .describe(
           "Fingerprint for optimistic concurrency control. Required for 'update' and 'revert' actions.",
         ),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
+        ),
     },
     async ({
       action,
@@ -61,6 +83,8 @@ export const zoneActions = (
       zoneId,
       createOrUpdateConfig,
       fingerprint,
+      page,
+      itemsPerPage,
     }): Promise<CallToolResult> => {
       log(
         `Running tool: gtm_zone for action '${action}' on account ${accountId}, container ${containerId}, workspace ${workspaceId}${
@@ -110,14 +134,31 @@ export const zoneActions = (
           }
 
           case "list": {
-            const response =
-              await tagmanager.accounts.containers.workspaces.zones.list({
-                parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
-              });
+            let all: Schema$Zone[] = [];
+            let currentPageToken = "";
+
+            do {
+              const response =
+                await tagmanager.accounts.containers.workspaces.zones.list({
+                  parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
+                  pageToken: currentPageToken,
+                });
+
+              if (response.data.zone) {
+                all = all.concat(response.data.zone);
+              }
+
+              currentPageToken = response.data.nextPageToken || "";
+            } while (currentPageToken);
+
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
 
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }

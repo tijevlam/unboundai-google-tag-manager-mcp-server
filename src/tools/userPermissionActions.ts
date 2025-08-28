@@ -3,8 +3,16 @@ import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { UserPermissionSchema } from "../schemas/UserPermissionSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
+import Schema$Account = tagmanager_v2.Schema$Account;
 import Schema$UserPermission = tagmanager_v2.Schema$UserPermission;
+
+const ITEMS_PER_PAGE = 50;
 
 export const userPermissionActions = (
   server: McpServer,
@@ -12,7 +20,7 @@ export const userPermissionActions = (
 ): void => {
   server.tool(
     "gtm_user_permission",
-    "Performs all user permission operations: create, get, list, update, remove. Use the 'action' parameter to select the operation.",
+    `Performs all user permission operations: create, get, list, update, remove. The 'list' action returns up to ${ITEMS_PER_PAGE} items per page.`,
     {
       action: z
         .enum(["create", "get", "list", "update", "remove"])
@@ -33,17 +41,29 @@ export const userPermissionActions = (
       createOrUpdateConfig: UserPermissionSchema.optional().describe(
         "Configuration for 'create' and 'update' actions. All fields correspond to the GTM user permission resource.",
       ),
-      pageToken: z
-        .string()
-        .optional()
-        .describe("A token for pagination. Optional for 'list' action."),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
+        ),
     },
     async ({
       action,
       accountId,
       userPermissionId,
       createOrUpdateConfig,
-      pageToken,
+      page,
+      itemsPerPage,
     }) => {
       log(`Running tool: gtm_user_permission with action ${action}`);
 
@@ -87,14 +107,30 @@ export const userPermissionActions = (
             };
           }
           case "list": {
-            const response = await tagmanager.accounts.user_permissions.list({
-              parent: `accounts/${accountId}`,
-              pageToken,
-            });
+            let all: Schema$Account[] = [];
+            let currentPageToken = "";
+
+            do {
+              const response = await tagmanager.accounts.user_permissions.list({
+                parent: `accounts/${accountId}`,
+                pageToken: currentPageToken,
+              });
+
+              if (response.data.userPermission) {
+                all = all.concat(response.data.userPermission);
+              }
+
+              currentPageToken = response.data.nextPageToken || "";
+            } while (currentPageToken);
+
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
 
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }
