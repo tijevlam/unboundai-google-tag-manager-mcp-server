@@ -1,7 +1,16 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
+import Schema$Destination = tagmanager_v2.Schema$Destination;
+
+const ITEMS_PER_PAGE = 50;
 
 export const destinationActions = (
   server: McpServer,
@@ -9,7 +18,7 @@ export const destinationActions = (
 ): void => {
   server.tool(
     "gtm_destination",
-    "Performs all destination operations: get, list, link, unlink. Use the 'action' parameter to select the operation.",
+    `Performs all destination operations: get, list, link, unlink.  The 'list' action returns up to ${ITEMS_PER_PAGE} items per page.`,
     {
       action: z
         .enum(["get", "list", "link", "unlink"])
@@ -38,6 +47,21 @@ export const destinationActions = (
         .describe(
           "If true, allows user permission feature update during linking. Optional for 'link' action.",
         ),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
+        ),
     },
     async ({
       action,
@@ -45,6 +69,8 @@ export const destinationActions = (
       containerId,
       destinationId,
       allowUserPermissionFeatureUpdate,
+      page,
+      itemsPerPage,
     }) => {
       log(`Running tool: gtm_destination with action ${action}`);
 
@@ -74,9 +100,15 @@ export const destinationActions = (
                 parent: `accounts/${accountId}/containers/${containerId}`,
               });
 
+            const all = response.data as Schema$Destination[];
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
+
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }

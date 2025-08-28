@@ -3,7 +3,12 @@ import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { ClientSchema } from "../schemas/ClientSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
 import Schema$Client = tagmanager_v2.Schema$Client;
 
 const PayloadSchema = ClientSchema.omit({
@@ -14,13 +19,15 @@ const PayloadSchema = ClientSchema.omit({
   fingerprint: true,
 });
 
+const ITEMS_PER_PAGE = 50;
+
 export const clientActions = (
   server: McpServer,
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_client",
-    "Performs all client operations: create, get, list, update, remove, revert. Use the 'action' parameter to select the operation.",
+    `Performs all client operations: create, get, list, update, remove, revert. The 'list' action returns up to itemsPerPage items per page.`,
     {
       action: z
         .enum(["create", "get", "list", "update", "remove", "revert"])
@@ -45,15 +52,26 @@ export const clientActions = (
       createOrUpdateConfig: PayloadSchema.optional().describe(
         "Configuration for 'create' and 'update' actions. All fields correspond to the GTM Client resource, except IDs.",
       ),
-      pageToken: z
-        .string()
-        .optional()
-        .describe("A token for pagination. Optional for 'list' action."),
       fingerprint: z
         .string()
         .optional()
         .describe(
           "The fingerprint for optimistic concurrency control. Required for 'update' and 'revert' actions.",
+        ),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
         ),
     },
     async ({
@@ -63,8 +81,9 @@ export const clientActions = (
       workspaceId,
       clientId,
       createOrUpdateConfig,
-      pageToken,
       fingerprint,
+      page,
+      itemsPerPage,
     }) => {
       log(`Running tool: gtm_client with action ${action}`);
 
@@ -108,15 +127,31 @@ export const clientActions = (
             };
           }
           case "list": {
-            const response =
-              await tagmanager.accounts.containers.workspaces.clients.list({
-                parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
-                pageToken,
-              });
+            let all: Schema$Client[] = [];
+            let currentPageToken = "";
+
+            do {
+              const response =
+                await tagmanager.accounts.containers.workspaces.clients.list({
+                  parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
+                  pageToken: currentPageToken,
+                });
+
+              if (response.data.client) {
+                all = all.concat(response.data.client);
+              }
+
+              currentPageToken = response.data.nextPageToken || "";
+            } while (currentPageToken);
+
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
 
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }

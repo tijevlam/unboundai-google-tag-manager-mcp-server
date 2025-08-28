@@ -3,7 +3,12 @@ import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { TagSchema } from "../schemas/TagSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
 import Schema$Tag = tagmanager_v2.Schema$Tag;
 
 const PayloadSchema = TagSchema.omit({
@@ -14,13 +19,15 @@ const PayloadSchema = TagSchema.omit({
   fingerprint: true,
 });
 
+const ITEMS_PER_PAGE = 20;
+
 export const tagActions = (
   server: McpServer,
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_tag",
-    "Performs all GTM tag operations: create, get, list, update, remove, revert. Use the 'action' parameter to select the operation.",
+    `Performs all GTM tag operations: create, get, list, update, remove, revert. The 'list' action returns up to ${ITEMS_PER_PAGE} items per page.`,
     {
       action: z
         .enum(["create", "get", "list", "update", "remove", "revert"])
@@ -43,7 +50,7 @@ export const tagActions = (
           "The unique ID of the GTM tag. Required for 'get', 'update', 'remove', and 'revert' actions.",
         ),
       createOrUpdateConfig: PayloadSchema.optional().describe(
-        "Configuration for 'create' and 'update' actions. All fields correspond to the GTM tag resource, except IDs."
+        "Configuration for 'create' and 'update' actions. All fields correspond to the GTM tag resource, except IDs.",
       ),
       fingerprint: z
         .string()
@@ -51,10 +58,21 @@ export const tagActions = (
         .describe(
           "The fingerprint for optimistic concurrency control. Required for 'update' and 'revert' actions.",
         ),
-      pageToken: z
-        .string()
-        .optional()
-        .describe("A token for pagination. Optional for 'list' action."),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
+        ),
     },
     async ({
       action,
@@ -64,7 +82,8 @@ export const tagActions = (
       tagId,
       createOrUpdateConfig,
       fingerprint,
-      pageToken,
+      page,
+      itemsPerPage,
     }) => {
       log(`Running tool: gtm_tag with action ${action}`);
 
@@ -108,15 +127,31 @@ export const tagActions = (
             };
           }
           case "list": {
-            const response =
-              await tagmanager.accounts.containers.workspaces.tags.list({
-                parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
-                pageToken,
-              });
+            let all: Schema$Tag[] = [];
+            let currentPageToken = "";
+
+            do {
+              const response =
+                await tagmanager.accounts.containers.workspaces.tags.list({
+                  parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
+                  pageToken: currentPageToken,
+                });
+
+              if (response.data.tag) {
+                all = all.concat(response.data.tag);
+              }
+
+              currentPageToken = response.data.nextPageToken || "";
+            } while (currentPageToken);
+
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
 
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }

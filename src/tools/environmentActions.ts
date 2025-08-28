@@ -1,8 +1,15 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { EnvironmentSchema } from "../schemas/EnvironmentSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
+import Schema$Environment = tagmanager_v2.Schema$Environment;
 
 const PayloadSchema = EnvironmentSchema.omit({
   accountId: true,
@@ -11,13 +18,15 @@ const PayloadSchema = EnvironmentSchema.omit({
   fingerprint: true,
 });
 
+const ITEMS_PER_PAGE = 50;
+
 export const environmentActions = (
   server: McpServer,
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_environment",
-    "Performs all environment operations: create, get, list, update, remove, reauthorize. Use the 'action' parameter to select the operation.",
+    `Performs all environment operations: create, get, list, update, remove, reauthorize.  The 'list' action returns up to ${ITEMS_PER_PAGE} items per page.`,
     {
       action: z
         .enum(["create", "get", "list", "update", "remove", "reauthorize"])
@@ -49,10 +58,21 @@ export const environmentActions = (
         .describe(
           "The fingerprint for optimistic concurrency control. Required for 'update' action.",
         ),
-      pageToken: z
-        .string()
-        .optional()
-        .describe("A token for pagination. Optional for 'list' action."),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
+        ),
     },
     async ({
       action,
@@ -61,7 +81,8 @@ export const environmentActions = (
       environmentId,
       createOrUpdateConfig,
       fingerprint,
-      pageToken,
+      page,
+      itemsPerPage,
     }) => {
       log(`Running tool: gtm_environment with action ${action}`);
       try {
@@ -99,14 +120,31 @@ export const environmentActions = (
             };
           }
           case "list": {
-            const response =
-              await tagmanager.accounts.containers.environments.list({
-                parent: `accounts/${accountId}/containers/${containerId}`,
-                pageToken,
-              });
+            let all: Schema$Environment[] = [];
+            let currentPageToken = "";
+
+            do {
+              const response =
+                await tagmanager.accounts.containers.environments.list({
+                  parent: `accounts/${accountId}/containers/${containerId}`,
+                  pageToken: currentPageToken,
+                });
+
+              if (response.data.environment) {
+                all = all.concat(response.data.environment);
+              }
+
+              currentPageToken = response.data.nextPageToken || "";
+            } while (currentPageToken);
+
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
+
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }

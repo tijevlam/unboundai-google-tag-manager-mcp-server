@@ -3,7 +3,12 @@ import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { TriggerSchema } from "../schemas/TriggerSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
 import Schema$Trigger = tagmanager_v2.Schema$Trigger;
 
 const PayloadSchema = TriggerSchema.omit({
@@ -14,13 +19,15 @@ const PayloadSchema = TriggerSchema.omit({
   fingerprint: true,
 });
 
+const ITEMS_PER_PAGE = 20;
+
 export const triggerActions = (
   server: McpServer,
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_trigger",
-    "Performs all GTM trigger operations: create, get, list, update, remove, revert. Use the 'action' parameter to select the operation.",
+    `Performs all GTM trigger operations: create, get, list, update, remove, revert. The 'list' action returns up to ${ITEMS_PER_PAGE} items per page.`,
     {
       action: z
         .enum(["create", "get", "list", "update", "remove", "revert"])
@@ -51,10 +58,21 @@ export const triggerActions = (
         .describe(
           "The fingerprint for optimistic concurrency control. Required for 'update' and 'revert' actions.",
         ),
-      pageToken: z
-        .string()
-        .optional()
-        .describe("A token for pagination. Optional for 'list' action."),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
+        ),
     },
     async ({
       action,
@@ -64,7 +82,8 @@ export const triggerActions = (
       triggerId,
       createOrUpdateConfig,
       fingerprint,
-      pageToken,
+      page,
+      itemsPerPage,
     }) => {
       log(`Running tool: gtm_trigger with action ${action}`);
 
@@ -108,15 +127,31 @@ export const triggerActions = (
             };
           }
           case "list": {
-            const response =
-              await tagmanager.accounts.containers.workspaces.triggers.list({
-                parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
-                pageToken,
-              });
+            let all: Schema$Trigger[] = [];
+            let currentPageToken = "";
+
+            do {
+              const response =
+                await tagmanager.accounts.containers.workspaces.triggers.list({
+                  parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
+                  pageToken: currentPageToken,
+                });
+
+              if (response.data.trigger) {
+                all = all.concat(response.data.trigger);
+              }
+
+              currentPageToken = response.data.nextPageToken || "";
+            } while (currentPageToken);
+
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
 
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }

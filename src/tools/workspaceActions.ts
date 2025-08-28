@@ -13,7 +13,12 @@ import { TriggerSchema } from "../schemas/TriggerSchema";
 import { VariableSchema } from "../schemas/VariableSchema";
 import { WorkspaceSchema } from "../schemas/WorkspaceSchema";
 import { ZoneSchema } from "../schemas/ZoneSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  log,
+  paginateArray,
+} from "../utils";
 import Schema$Entity = tagmanager_v2.Schema$Entity;
 import Schema$Workspace = tagmanager_v2.Schema$Workspace;
 
@@ -37,13 +42,15 @@ const PayloadSchema = WorkspaceSchema.omit({
   fingerprint: true,
 });
 
+const ITEMS_PER_PAGE = 50;
+
 export const workspaceActions = (
   server: McpServer,
   { props }: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_workspace",
-    "Performs various workspace operations including create, get, list, update, remove, createVersion, getStatus, sync, quickPreview, and resolveConflict actions.",
+    `Performs various workspace operations including create, get, list, update, remove, createVersion, getStatus, sync, quickPreview, and resolveConflict actions. The 'list' action returns up to ${ITEMS_PER_PAGE} items per page.`,
     {
       action: z
         .enum([
@@ -93,6 +100,21 @@ export const workspaceActions = (
         .describe(
           "The status of the change for the entity in the workspace for 'resolveConflict' action. Possible values: 'added', 'modified', 'deleted', 'unmodified'.",
         ),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          `Page number for pagination (starts from 1). Each page contains up to itemsPerPage items.`,
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Default: ${ITEMS_PER_PAGE}. Use lower values if experiencing response issues.`,
+        ),
     },
     async ({
       action,
@@ -103,6 +125,8 @@ export const workspaceActions = (
       fingerprint,
       entity,
       changeStatus,
+      page,
+      itemsPerPage,
     }): Promise<CallToolResult> => {
       log(
         `Running tool: gtm_workspace for action '${action}' on account ${accountId}, container ${containerId}${
@@ -152,14 +176,31 @@ export const workspaceActions = (
           }
 
           case "list": {
-            const response =
-              await tagmanager.accounts.containers.workspaces.list({
-                parent: `accounts/${accountId}/containers/${containerId}`,
-              });
+            let all: Schema$Workspace[] = [];
+            let currentPageToken = "";
+
+            do {
+              const response =
+                await tagmanager.accounts.containers.workspaces.list({
+                  parent: `accounts/${accountId}/containers/${containerId}`,
+                  pageToken: currentPageToken,
+                });
+
+              if (response.data.workspace) {
+                all = all.concat(response.data.workspace);
+              }
+
+              currentPageToken = response.data.nextPageToken || "";
+            } while (currentPageToken);
+
+            const paginatedResult = paginateArray(all, page, itemsPerPage);
 
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                {
+                  type: "text",
+                  text: JSON.stringify(paginatedResult, null, 2),
+                },
               ],
             };
           }
