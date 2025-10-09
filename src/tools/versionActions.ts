@@ -3,7 +3,14 @@ import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
 import { McpAgentToolParamsModel } from "../models/McpAgentModel";
 import { ContainerVersionSchema } from "../schemas/ContainerVersionSchema";
-import { createErrorResponse, getTagManagerClient, log } from "../utils";
+import {
+  createErrorResponse,
+  getTagManagerClient,
+  ITEMS_PER_PAGE,
+  log,
+  processVersionData,
+  ResourceType,
+} from "../utils";
 import Schema$ContainerVersion = tagmanager_v2.Schema$ContainerVersion;
 
 const PayloadSchema = ContainerVersionSchema.omit({
@@ -18,7 +25,7 @@ export const versionActions = (
 ): void => {
   server.tool(
     "gtm_version",
-    "Performs all container version operations: get, live, publish, remove, setLatest, undelete, update. Use the 'action' parameter to select the operation.",
+    `Performs all container version operations: get, live, publish, remove, setLatest, undelete, update. For 'get' and 'live' actions, use 'resourceType' to paginate specific resource arrays (up to ${ITEMS_PER_PAGE} items per page) to avoid response truncation.`,
     {
       action: z
         .enum([
@@ -56,6 +63,44 @@ export const versionActions = (
         .describe(
           "The fingerprint for optimistic concurrency control. Required for 'publish' and 'update' actions.",
         ),
+      resourceType: z
+        .enum([
+          "tag",
+          "trigger",
+          "variable",
+          "folder",
+          "builtInVariable",
+          "zone",
+          "customTemplate",
+          "client",
+          "gtagConfig",
+          "transformation",
+        ])
+        .optional()
+        .describe(
+          "Specific resource type to retrieve with pagination (only for 'get' and 'live' actions). If not specified, returns summary with sample items.",
+        ),
+      page: z
+        .number()
+        .min(1)
+        .default(1)
+        .describe(
+          "Page number for pagination (starts from 1). Only used when resourceType is specified.",
+        ),
+      itemsPerPage: z
+        .number()
+        .min(1)
+        .max(ITEMS_PER_PAGE)
+        .default(ITEMS_PER_PAGE)
+        .describe(
+          `Number of items to return per page (1-${ITEMS_PER_PAGE}). Only used when resourceType is specified.`,
+        ),
+      includeSummary: z
+        .boolean()
+        .default(true)
+        .describe(
+          "Include counts and metadata for all resource types. Only used when resourceType is specified.",
+        ),
     },
     async ({
       action,
@@ -64,6 +109,10 @@ export const versionActions = (
       containerVersionId,
       createOrUpdateConfig,
       fingerprint,
+      resourceType,
+      page,
+      itemsPerPage,
+      includeSummary,
     }) => {
       log(`Running tool: gtm_version with action ${action}`);
 
@@ -82,9 +131,17 @@ export const versionActions = (
               path: `accounts/${accountId}/containers/${containerId}/versions/${containerVersionId}`,
             });
 
+            const processedData = processVersionData(
+              response.data,
+              resourceType as ResourceType | undefined,
+              page,
+              itemsPerPage,
+              includeSummary,
+            );
+
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                { type: "text", text: JSON.stringify(processedData, null, 2) },
               ],
             };
           }
@@ -95,9 +152,17 @@ export const versionActions = (
               },
             );
 
+            const processedData = processVersionData(
+              response.data,
+              resourceType as ResourceType | undefined,
+              page,
+              itemsPerPage,
+              includeSummary,
+            );
+
             return {
               content: [
-                { type: "text", text: JSON.stringify(response.data, null, 2) },
+                { type: "text", text: JSON.stringify(processedData, null, 2) },
               ],
             };
           }
