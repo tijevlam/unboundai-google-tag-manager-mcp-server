@@ -86,3 +86,59 @@ Some MCP clients (like Cursor AI) have a 60-character limit for the combined MCP
 
 To avoid this issue:
 - Use shorter server names in your MCP configuration (e.g., `gtm-mcp-server`)
+
+**Debugging Server Issues**
+
+If the MCP server crashes or encounters issues, you can enable comprehensive debug logging to diagnose the problem:
+
+1. **Enable Debug Mode**: Set the `DEBUG` environment variable to `true` or `1`:
+   ```json
+   {
+     "mcpServers": {
+       "gtm-mcp-server": {
+         "command": "npx",
+         "args": ["-y", "google-tag-manager-mcp-server"],
+         "env": {
+           "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_CREDENTIALS_JSON",
+           "DEBUG": "true"
+         }
+       }
+     }
+   }
+   ```
+
+2. **Control Log Level**: Alternatively, set the `LOG_LEVEL` environment variable to control logging verbosity:
+   - `DEBUG`: Shows all debug messages (most verbose)
+   - `INFO`: Shows informational messages and above (default)
+   - `WARN`: Shows only warnings and errors
+   - `ERROR`: Shows only error messages
+
+   Example:
+   ```json
+   {
+     "mcpServers": {
+       "gtm-mcp-server": {
+         "command": "npx",
+         "args": ["-y", "google-tag-manager-mcp-server"],
+         "env": {
+           "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_CREDENTIALS_JSON",
+           "LOG_LEVEL": "DEBUG"
+         }
+       }
+     }
+   }
+   ```
+
+3. **Check MCP Client Logs**: The debug output is written to stderr and will appear in your MCP client's logs. In Claude Desktop:
+   - macOS: `~/Library/Logs/Claude/mcp*.log`
+   - Windows: `%APPDATA%\Claude\logs\mcp*.log`
+
+Debug logging provides detailed information about:
+- Server initialization and startup
+- Environment configuration
+- Authentication with Google APIs
+- Tool registration
+- API calls and responses
+- Error details with stack traces
+
+**Note**: Debug logging may produce verbose output. It's recommended to enable it only when troubleshooting issues.
