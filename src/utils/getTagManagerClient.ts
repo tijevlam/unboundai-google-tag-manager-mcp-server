@@ -21,7 +21,7 @@ function getAuthClient(): GoogleAuth {
 export async function getTagManagerClient(): Promise<TagManagerClient> {
   try {
     const auth = getAuthClient();
-    
+
     return google.tagmanager({
       version: "v2",
       auth: auth as any,

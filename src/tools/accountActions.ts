@@ -10,7 +10,8 @@ const PayloadSchema = AccountSchema.omit({
 
 export const accountActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_account",

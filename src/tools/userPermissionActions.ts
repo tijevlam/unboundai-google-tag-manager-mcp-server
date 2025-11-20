@@ -16,7 +16,8 @@ const ITEMS_PER_PAGE = 50;
 
 export const userPermissionActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_user_permission",

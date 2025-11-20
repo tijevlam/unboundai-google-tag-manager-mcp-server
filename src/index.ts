@@ -15,7 +15,7 @@ tools.forEach((register) => {
   register(server, { props: {} });
 });
 
-async function main() {
+async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error("Google Tag Manager MCP Server running on stdio");
