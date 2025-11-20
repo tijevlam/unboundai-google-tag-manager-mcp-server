@@ -1,14 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
-import { McpAgentToolParamsModel } from "../models/McpAgentModel";
-import { UserPermissionSchema } from "../schemas/UserPermissionSchema";
+import { McpAgentToolParamsModel } from "../models/McpAgentModel.js";
+import { UserPermissionSchema } from "../schemas/UserPermissionSchema.js";
 import {
   createErrorResponse,
   getTagManagerClient,
   log,
   paginateArray,
-} from "../utils";
+} from "../utils/index.js";
 import Schema$Account = tagmanager_v2.Schema$Account;
 import Schema$UserPermission = tagmanager_v2.Schema$UserPermission;
 
@@ -16,7 +16,8 @@ const ITEMS_PER_PAGE = 50;
 
 export const userPermissionActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_user_permission",
@@ -68,7 +69,7 @@ export const userPermissionActions = (
       log(`Running tool: gtm_user_permission with action ${action}`);
 
       try {
-        const tagmanager = await getTagManagerClient(props.accessToken);
+        const tagmanager = await getTagManagerClient();
 
         switch (action) {
           case "create": {
