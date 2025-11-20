@@ -21,7 +21,8 @@ const PayloadSchema = ContainerVersionSchema.omit({
 
 export const versionActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_version",

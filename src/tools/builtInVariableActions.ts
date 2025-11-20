@@ -14,7 +14,8 @@ const ITEMS_PER_PAGE = 50;
 
 export const builtInVariableActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_built_in_variable",

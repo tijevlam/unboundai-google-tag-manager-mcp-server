@@ -1,6 +1,5 @@
-export type McpAgentPropsModel = {
-  // No props needed for ADC-based authentication
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type McpAgentPropsModel = {};
 
 export type McpAgentToolParamsModel = {
   props: McpAgentPropsModel;

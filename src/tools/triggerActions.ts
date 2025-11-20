@@ -23,7 +23,8 @@ const ITEMS_PER_PAGE = 20;
 
 export const triggerActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_trigger",
