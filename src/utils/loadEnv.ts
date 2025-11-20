@@ -1,16 +1,31 @@
 import path from "path";
 import dotenv from "dotenv";
-import { log } from "./log.js";
+import { debug, warn } from "./log.js";
 
 // Load environment variables from .env file if it exists
 export function loadEnv(): void {
   try {
-    dotenv.config({
-      path: path.resolve(process.cwd(), process.env.ENV_FILE || ".env"),
+    const envFilePath = path.resolve(
+      process.cwd(),
+      process.env.ENV_FILE || ".env",
+    );
+    debug(`Attempting to load environment variables from: ${envFilePath}`);
+
+    const result = dotenv.config({
+      path: envFilePath,
     });
+
+    if (result.error) {
+      debug(
+        `No .env file found at ${envFilePath}, using environment variables directly.`,
+      );
+    } else {
+      debug(`Successfully loaded environment variables from ${envFilePath}`);
+      debug(`Loaded ${Object.keys(result.parsed || {}).length} variables`);
+    }
   } catch (error) {
-    log(
-      "Note: No .env file found, using environment variables directly.",
+    warn(
+      "Error loading .env file, using environment variables directly:",
       error,
     );
   }

@@ -7,6 +7,7 @@ import {
   getTagManagerClient,
   log,
 } from "../utils/index.js";
+import { debug } from "../utils/log.js";
 
 const PayloadSchema = AccountSchema.omit({
   accountId: true,
@@ -17,6 +18,7 @@ export const accountActions = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _toolParams: McpAgentToolParamsModel,
 ): void => {
+  debug("Registering gtm_account tool...");
   server.tool(
     "gtm_account",
     "Performs all account-related operations: get, list, update. Use the 'action' parameter to select the operation.",
@@ -33,9 +35,13 @@ export const accountActions = (
     },
     async ({ action, accountId, config }) => {
       log(`Running tool: gtm_account with action ${action}`);
+      debug(`Account ID: ${accountId || "N/A"}`);
+      debug(`Config provided: ${!!config}`);
 
       try {
+        debug("Getting Tag Manager client...");
         const tagmanager = await getTagManagerClient();
+        debug("Tag Manager client obtained");
 
         switch (action) {
           case "get": {
@@ -43,9 +49,11 @@ export const accountActions = (
               throw new Error(`accountId is required for ${action} action`);
             }
 
+            debug(`Fetching account: accounts/${accountId}`);
             const response = await tagmanager.accounts.get({
               path: `accounts/${accountId}`,
             });
+            debug(`Account fetched successfully: ${response.data.name}`);
             return {
               content: [
                 { type: "text", text: JSON.stringify(response.data, null, 2) },
@@ -53,7 +61,9 @@ export const accountActions = (
             };
           }
           case "list": {
+            debug("Listing all accounts...");
             const response = await tagmanager.accounts.list({});
+            debug(`Retrieved ${response.data.account?.length || 0} accounts`);
             return {
               content: [
                 { type: "text", text: JSON.stringify(response.data, null, 2) },
@@ -69,10 +79,12 @@ export const accountActions = (
               throw new Error(`config is required for ${action} action`);
             }
 
+            debug(`Updating account: accounts/${accountId}`);
             const response = await tagmanager.accounts.update({
               path: `accounts/${accountId}`,
               requestBody: config,
             });
+            debug(`Account updated successfully: ${response.data.name}`);
             return {
               content: [
                 { type: "text", text: JSON.stringify(response.data, null, 2) },
@@ -90,4 +102,5 @@ export const accountActions = (
       }
     },
   );
+  debug("gtm_account tool registered successfully");
 };
