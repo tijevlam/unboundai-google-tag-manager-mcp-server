@@ -6,7 +6,6 @@ import { destinationActions } from "./destinationActions";
 import { environmentActions } from "./environmentActions";
 import { folderActions } from "./folderActions";
 import { gtagConfigActions } from "./gtagConfigActions";
-import { removeMCPServerData } from "./removeMCPServerData";
 import { tagActions } from "./tagActions";
 import { templateActions } from "./templateActions";
 import { transformationActions } from "./transformationActions";
@@ -37,5 +36,4 @@ export const tools = [
   versionActions,
   workspaceActions,
   zoneActions,
-  removeMCPServerData,
 ];

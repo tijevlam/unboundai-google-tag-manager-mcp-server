@@ -88,7 +88,7 @@ export const tagActions = (
       log(`Running tool: gtm_tag with action ${action}`);
 
       try {
-        const tagmanager = await getTagManagerClient(props.accessToken);
+        const tagmanager = await getTagManagerClient();
 
         switch (action) {
           case "create": {

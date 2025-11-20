@@ -1,12 +1,7 @@
 export type McpAgentPropsModel = {
-  userId: string;
-  name: string;
-  email: string;
-  accessToken: string;
-  clientId: string;
+  // No props needed for ADC-based authentication
 };
 
 export type McpAgentToolParamsModel = {
   props: McpAgentPropsModel;
-  env: Env;
 };
