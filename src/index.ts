@@ -17,7 +17,7 @@ debug(`Environment variables:`, {
   LOG_LEVEL: process.env.LOG_LEVEL,
   NO_COLOR: process.env.NO_COLOR,
   GOOGLE_APPLICATION_CREDENTIALS: process.env.GOOGLE_APPLICATION_CREDENTIALS
-    ? `Set (${process.env.GOOGLE_APPLICATION_CREDENTIALS})`
+    ? "Set"
     : "Not set",
   NODE_ENV: process.env.NODE_ENV,
 });

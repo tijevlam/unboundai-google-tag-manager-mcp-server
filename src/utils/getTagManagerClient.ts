@@ -15,7 +15,7 @@ function getAuthClient(): GoogleAuth {
       debug("Initializing Google Auth client...");
       debug(`Required scope: ${READ_WRITE_TAG_MANAGER_SCOPE}`);
       debug(
-        `GOOGLE_APPLICATION_CREDENTIALS: ${process.env.GOOGLE_APPLICATION_CREDENTIALS || "Not set"}`,
+        `GOOGLE_APPLICATION_CREDENTIALS: ${process.env.GOOGLE_APPLICATION_CREDENTIALS ? "Set" : "Not set"}`,
       );
 
       authClient = new GoogleAuth({
