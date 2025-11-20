@@ -1,14 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
-import { McpAgentToolParamsModel } from "../models/McpAgentModel";
-import { FolderSchema } from "../schemas/FolderSchema";
+import { McpAgentToolParamsModel } from "../models/McpAgentModel.js";
+import { FolderSchema } from "../schemas/FolderSchema.js";
 import {
   createErrorResponse,
   getTagManagerClient,
   log,
   paginateArray,
-} from "../utils";
+} from "../utils/index.js";
 import Schema$Folder = tagmanager_v2.Schema$Folder;
 
 const PayloadSchema = FolderSchema.omit({
@@ -23,7 +23,8 @@ const ITEMS_PER_PAGE = 50;
 
 export const folderActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_folder",
@@ -118,7 +119,7 @@ export const folderActions = (
       log(`Running tool: gtm_folder with action ${action}`);
 
       try {
-        const tagmanager = await getTagManagerClient(props.accessToken);
+        const tagmanager = await getTagManagerClient();
 
         switch (action) {
           case "create": {

@@ -1,14 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
-import { McpAgentToolParamsModel } from "../models/McpAgentModel";
-import { GtagConfigSchema } from "../schemas/GtagConfigSchema";
+import { McpAgentToolParamsModel } from "../models/McpAgentModel.js";
+import { GtagConfigSchema } from "../schemas/GtagConfigSchema.js";
 import {
   createErrorResponse,
   getTagManagerClient,
   log,
   paginateArray,
-} from "../utils";
+} from "../utils/index.js";
 import Schema$GtagConfig = tagmanager_v2.Schema$GtagConfig;
 
 const PayloadSchema = GtagConfigSchema.omit({
@@ -23,7 +23,8 @@ const ITEMS_PER_PAGE = 50;
 
 export const gtagConfigActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_gtag_config",
@@ -94,7 +95,7 @@ export const gtagConfigActions = (
       log(`Running tool: gtm_gtag_config with action ${action}`);
 
       try {
-        const tagmanager = await getTagManagerClient(props.accessToken);
+        const tagmanager = await getTagManagerClient();
 
         switch (action) {
           case "create": {

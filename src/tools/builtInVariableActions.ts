@@ -1,20 +1,21 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { tagmanager_v2 } from "googleapis";
 import { z } from "zod";
-import { McpAgentToolParamsModel } from "../models/McpAgentModel";
+import { McpAgentToolParamsModel } from "../models/McpAgentModel.js";
 import {
   createErrorResponse,
   getTagManagerClient,
   log,
   paginateArray,
-} from "../utils";
+} from "../utils/index.js";
 import Schema$BuiltInVariable = tagmanager_v2.Schema$BuiltInVariable;
 
 const ITEMS_PER_PAGE = 50;
 
 export const builtInVariableActions = (
   server: McpServer,
-  { props }: McpAgentToolParamsModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _toolParams: McpAgentToolParamsModel,
 ): void => {
   server.tool(
     "gtm_built_in_variable",
@@ -85,7 +86,7 @@ export const builtInVariableActions = (
       log(`Running tool: gtm_built_in_variable with action ${action}`);
 
       try {
-        const tagmanager = await getTagManagerClient(props.accessToken);
+        const tagmanager = await getTagManagerClient();
 
         switch (action) {
           case "create": {

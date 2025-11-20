@@ -1,12 +1,6 @@
-export type McpAgentPropsModel = {
-  userId: string;
-  name: string;
-  email: string;
-  accessToken: string;
-  clientId: string;
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type McpAgentPropsModel = {};
 
 export type McpAgentToolParamsModel = {
   props: McpAgentPropsModel;
-  env: Env;
 };
