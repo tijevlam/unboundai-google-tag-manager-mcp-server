@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "author": "stape-io",
   "homepage": "https://github.com/stape-io/google-tag-manager-mcp-server",
+  "type": "module",
   "main": "dist/index.js",
   "bin": {
     "google-tag-manager-mcp-server": "./dist/index.js"

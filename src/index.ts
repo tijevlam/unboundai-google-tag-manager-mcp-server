@@ -2,8 +2,8 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { tools } from "./tools";
-import { getPackageVersion } from "./utils";
+import { tools } from "./tools/index.js";
+import { getPackageVersion } from "./utils/index.js";
 
 const server = new McpServer({
   name: "google-tag-manager-mcp-server",

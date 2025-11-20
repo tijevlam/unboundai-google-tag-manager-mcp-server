@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { GoogleAuth } from "google-auth-library";
-import { log } from "./log";
+import { log } from "./log.js";
 
 type TagManagerClient = ReturnType<typeof google.tagmanager>;
 
