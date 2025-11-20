@@ -1,17 +1,30 @@
 import { google } from "googleapis";
+import { GoogleAuth } from "google-auth-library";
 import { log } from "./log";
 
 type TagManagerClient = ReturnType<typeof google.tagmanager>;
 
-export async function getTagManagerClient(
-  accessToken: string,
-): Promise<TagManagerClient> {
+const READ_WRITE_TAG_MANAGER_SCOPE =
+  "https://www.googleapis.com/auth/tagmanager.edit.containers";
+
+let authClient: GoogleAuth | null = null;
+
+function getAuthClient(): GoogleAuth {
+  if (!authClient) {
+    authClient = new GoogleAuth({
+      scopes: [READ_WRITE_TAG_MANAGER_SCOPE],
+    });
+  }
+  return authClient;
+}
+
+export async function getTagManagerClient(): Promise<TagManagerClient> {
   try {
+    const auth = getAuthClient();
+    
     return google.tagmanager({
       version: "v2",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      auth: auth as any,
     });
   } catch (error) {
     log("Error creating Tag Manager client:", error);

@@ -93,7 +93,7 @@ export const zoneActions = (
       );
 
       try {
-        const tagmanager = await getTagManagerClient(props.accessToken);
+        const tagmanager = await getTagManagerClient();
 
         switch (action) {
           case "create": {
