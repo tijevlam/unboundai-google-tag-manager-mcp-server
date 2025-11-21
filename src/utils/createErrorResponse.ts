@@ -1,12 +1,14 @@
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { TAG_MANAGER_REMOVE_MCP_SERVER_DATA } from "../constants/tools.js";
-import { log } from "./log.js";
+import { error as logError, debug } from "./log.js";
 
 export function createErrorResponse(
   message: string,
   error?: any,
 ): CallToolResult {
   let detailedMessage = "";
+
+  debug(`Creating error response for: ${message}`);
 
   if (error?.code) {
     if (error.code === 401) {
@@ -20,11 +22,12 @@ export function createErrorResponse(
     }
   } else if (error instanceof Error) {
     detailedMessage = `${message}: ${error.message}`;
+    debug("Error stack trace:", error.stack);
   } else {
     detailedMessage = `${message}: ${String(error)}`;
   }
 
-  log("MCP Tool Error:", detailedMessage); // Log errors to stderr
+  logError("MCP Tool Error:", detailedMessage);
 
   return {
     isError: true,
