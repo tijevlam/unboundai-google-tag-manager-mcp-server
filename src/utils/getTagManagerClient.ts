@@ -4,8 +4,13 @@ import { debug, error as logError } from "./log.js";
 
 type TagManagerClient = ReturnType<typeof google.tagmanager>;
 
-const READ_WRITE_TAG_MANAGER_SCOPE =
-  ["https://www.googleapis.com/auth/tagmanager.readonly","https://www.googleapis.com/auth/tagmanager.edit.containers","https://www.googleapis.com/auth/tagmanager.edit.containerversions","https://www.googleapis.com/auth/tagmanager.manage.users","https://www.googleapis.com/auth/tagmanager.manage.accounts,https://www.googleapis.com/auth/tagmanager.publish"];
+const READ_WRITE_TAG_MANAGER_SCOPE = [
+  "https://www.googleapis.com/auth/tagmanager.readonly",
+  "https://www.googleapis.com/auth/tagmanager.edit.containers",
+  "https://www.googleapis.com/auth/tagmanager.edit.containerversions",
+  "https://www.googleapis.com/auth/tagmanager.manage.users",
+  "https://www.googleapis.com/auth/tagmanager.manage.accounts,https://www.googleapis.com/auth/tagmanager.publish",
+];
 
 let authClient: GoogleAuth | null = null;
 

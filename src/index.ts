@@ -6,7 +6,6 @@ import { tools } from "./tools/index.js";
 import { getPackageVersion } from "./utils/index.js";
 import { debug, info, error as logError } from "./utils/log.js";
 
-
 // Log startup information
 debug("=== MCP Server Initialization Started ===");
 debug(`Node version: ${process.version}`);
