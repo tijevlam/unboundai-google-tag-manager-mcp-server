@@ -6,7 +6,7 @@ import { tools } from "./tools/index.js";
 import { getPackageVersion } from "./utils/index.js";
 
 const server = new McpServer({
-  name: "google-tag-manager-mcp-server",
+  name: "unboundai-gtm-mcp-server",
   version: getPackageVersion(),
 });
 

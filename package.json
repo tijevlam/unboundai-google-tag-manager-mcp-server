@@ -1,27 +1,39 @@
 {
-  "name": "google-tag-manager-mcp-server",
-  "version": "3.0.4",
+  "name": "@unboundai/gtm-mcp-server",
+  "version": "3.0.6",
   "description": "MCP server for Google Tag Manager",
   "license": "Apache-2.0",
-  "author": "stape-io",
-  "homepage": "https://github.com/stape-io/google-tag-manager-mcp-server",
+  "author": "stape.io & tijevlam",
+  "homepage": "https://github.com/tijevlam/unboundai-google-tag-manager-mcp-server",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "google-tag-manager-mcp-server": "./dist/index.js"
+    "unboundai-gtm-mcp-server": "dist/index.js"
   },
   "keywords": [
     "mcp",
     "modelcontextprotocol",
     "gtm",
-    "stape"
+    "unboundai"
   ],
   "scripts": {
-    "build": "tsc && chmod 755 dist/index.js",
+    "build": "tsc",
     "postinstall": "npm run build",
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --ext .ts src --fix",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "start": "node dist/index.js",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tijevlam/unboundai-google-tag-manager-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tijevlam/unboundai-google-tag-manager-mcp-server/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.1",
