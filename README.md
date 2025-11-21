@@ -62,12 +62,9 @@ Credentials saved to file: [PATH_TO_CREDENTIALS_JSON]
 ```json
 {
   "mcpServers": {
-    "gtm-mcp-server": {
+    "unboundai-gtm-mcp-server": {
       "command": "npx",
-      "args": [
-        "-y",
-        "google-tag-manager-mcp-server"
-      ],
+      "args": ["-y","@unboundai/gtm-mcp-server"],
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_CREDENTIALS_JSON"
       }
@@ -82,10 +79,10 @@ Credentials saved to file: [PATH_TO_CREDENTIALS_JSON]
 
 **MCP Server Name Length Limit**
 
-Some MCP clients (like Cursor AI) have a 60-character limit for the combined MCP server name + tool name length. If you use a longer server name in your configuration (e.g., `gtm-mcp-server-your-additional-long-name`), some tools may be filtered out.
+Some MCP clients (like Cursor AI) have a 60-character limit for the combined MCP server name + tool name length. If you use a longer server name in your configuration (e.g., `unboundai-gtm-mcp-server-your-additional-long-name`), some tools may be filtered out.
 
 To avoid this issue:
-- Use shorter server names in your MCP configuration (e.g., `gtm-mcp-server`)
+- Use shorter server names in your MCP configuration (e.g., `unboundai-gtm-mcp-server`)
 
 **Debugging Server Issues**
 
@@ -95,9 +92,9 @@ If the MCP server crashes or encounters issues, you can enable comprehensive deb
    ```json
    {
      "mcpServers": {
-       "gtm-mcp-server": {
+       "unboundai-gtm-mcp-server": {
          "command": "npx",
-         "args": ["-y", "google-tag-manager-mcp-server"],
+         "args": ["-y", "@unboundai/gtm-mcp-server"],
          "env": {
            "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_CREDENTIALS_JSON",
            "DEBUG": "true"
@@ -117,9 +114,9 @@ If the MCP server crashes or encounters issues, you can enable comprehensive deb
    ```json
    {
      "mcpServers": {
-       "gtm-mcp-server": {
+       "unboundai-gtm-mcp-server": {
          "command": "npx",
-         "args": ["-y", "google-tag-manager-mcp-server"],
+         "args": ["-y", "@unboundai/gtm-mcp-server"],
          "env": {
            "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_CREDENTIALS_JSON",
            "LOG_LEVEL": "DEBUG"
