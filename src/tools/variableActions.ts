@@ -61,7 +61,7 @@ export const variableActions = (
         .string()
         .optional()
         .describe(
-          "The fingerprint for optimistic concurrency control. Required for 'update' and 'revert' actions.",
+          "The fingerprint for optimistic concurrency control. Optional for 'update' action if included in createOrUpdateConfig. Required for 'revert' action.",
         ),
       page: z
         .number()
@@ -171,15 +171,27 @@ export const variableActions = (
               );
             }
 
-            if (!fingerprint) {
-              throw new Error(`fingerprint is required for ${action} action`);
+            // Prepare the request body with fingerprint
+            // Fingerprint can come from either createOrUpdateConfig or the separate fingerprint parameter
+            const requestBody = { ...createOrUpdateConfig } as Schema$Variable;
+
+            // If fingerprint is provided as a separate parameter, include it in the request body
+            // This takes precedence over any fingerprint in createOrUpdateConfig
+            if (fingerprint) {
+              requestBody.fingerprint = fingerprint;
+            }
+
+            // Validate that fingerprint is present either in requestBody or was provided
+            if (!requestBody.fingerprint) {
+              throw new Error(
+                `fingerprint is required for ${action} action. Provide it either in createOrUpdateConfig or as a separate parameter.`,
+              );
             }
 
             const response =
               await tagmanager.accounts.containers.workspaces.variables.update({
                 path: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}/variables/${variableId}`,
-                fingerprint,
-                requestBody: createOrUpdateConfig as Schema$Variable,
+                requestBody,
               });
 
             return {
