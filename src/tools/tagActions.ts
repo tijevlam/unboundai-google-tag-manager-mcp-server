@@ -21,6 +21,54 @@ const PayloadSchema = TagSchema.omit({
 
 const ITEMS_PER_PAGE = 20;
 
+/**
+ * Helper to safely check if an object has its own property
+ */
+function hasOwn(obj: unknown, key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+/**
+ * Merges incoming partial tag fields into the existing tag.
+ * This ensures that required fields like 'type' and 'parameter' are preserved
+ * when performing partial updates.
+ */
+function mergeTag(
+  existingTag: Schema$Tag,
+  partial: Partial<Schema$Tag>,
+): Schema$Tag {
+  const merged = { ...existingTag };
+
+  // Merge all fields from partial into merged, overwriting existing values
+  for (const key in partial) {
+    if (hasOwn(partial, key)) {
+      const value = partial[key as keyof Schema$Tag];
+      if (value !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (merged as any)[key] = value;
+      }
+    }
+  }
+
+  return merged;
+}
+
+/**
+ * Ensures the tag has minimal integrity for required fields.
+ * For GA4 Configuration tags, ensures the type is 'gaawc'.
+ */
+function ensureMinimalIntegrity(tag: Schema$Tag): void {
+  // If tag has parameters that indicate it's a GA4 config but no type, set it
+  if (!tag.type && tag.parameter) {
+    const hasGA4Params = tag.parameter.some(
+      (p) => p.key === "measurementId" || p.key === "sendPageView",
+    );
+    if (hasGA4Params) {
+      tag.type = "gaawc";
+    }
+  }
+}
+
 export const tagActions = (
   server: McpServer,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -99,6 +147,13 @@ export const tagActions = (
               );
             }
 
+            // Validate that type is provided for create action
+            if (!createOrUpdateConfig.type) {
+              throw new Error(
+                `'type' field is required in createOrUpdateConfig for ${action} action. Specify the tag type (e.g., 'gaawc' for GA4 Configuration).`,
+              );
+            }
+
             const response =
               await tagmanager.accounts.containers.workspaces.tags.create({
                 parent: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}`,
@@ -167,27 +222,50 @@ export const tagActions = (
               );
             }
 
-            // Prepare the request body with fingerprint
-            // Fingerprint can come from either createOrUpdateConfig or the separate fingerprint parameter
-            const requestBody = { ...createOrUpdateConfig } as Schema$Tag;
+            // Fetch the existing tag to preserve required fields
+            log(`Fetching existing tag ${tagId} before update`);
+            const existingTagResponse =
+              await tagmanager.accounts.containers.workspaces.tags.get({
+                path: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}/tags/${tagId}`,
+              });
 
-            // If fingerprint is provided as a separate parameter, include it in the request body
-            // This takes precedence over any fingerprint in createOrUpdateConfig
-            if (fingerprint) {
-              requestBody.fingerprint = fingerprint;
-            }
-
-            // Validate that fingerprint is present either in requestBody or was provided
-            if (!requestBody.fingerprint) {
+            const existingTag = existingTagResponse.data;
+            if (!existingTag) {
               throw new Error(
-                `fingerprint is required for ${action} action. Provide it either in createOrUpdateConfig or as a separate parameter.`,
+                `Could not retrieve existing tag ${tagId} for update`,
               );
             }
 
+            // Merge incoming partial fields into the existing tag
+            const mergedTag = mergeTag(
+              existingTag,
+              createOrUpdateConfig as Schema$Tag,
+            );
+
+            // Ensure minimal integrity (e.g., GA4 Config tags have type 'gaawc')
+            ensureMinimalIntegrity(mergedTag);
+
+            // Handle fingerprint: use provided fingerprint, or fall back to existing tag's fingerprint
+            if (fingerprint) {
+              mergedTag.fingerprint = fingerprint;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } else if ((createOrUpdateConfig as any).fingerprint) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              mergedTag.fingerprint = (createOrUpdateConfig as any).fingerprint;
+            } else if (existingTag.fingerprint) {
+              // Use the existing tag's fingerprint if none was provided
+              mergedTag.fingerprint = existingTag.fingerprint;
+            } else {
+              throw new Error(
+                `fingerprint is required for ${action} action. The existing tag does not have a fingerprint, so you must provide one.`,
+              );
+            }
+
+            log(`Updating tag ${tagId} with merged fields`);
             const response =
               await tagmanager.accounts.containers.workspaces.tags.update({
                 path: `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}/tags/${tagId}`,
-                requestBody,
+                requestBody: mergedTag,
               });
 
             return {
