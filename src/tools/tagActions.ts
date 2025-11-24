@@ -21,12 +21,8 @@ const PayloadSchema = TagSchema.omit({
 
 const ITEMS_PER_PAGE = 20;
 
-/**
- * Helper to safely check if an object has its own property
- */
-function hasOwn(obj: unknown, key: string): boolean {
-  return Object.prototype.hasOwnProperty.call(obj, key);
-}
+// GA4 Configuration tag parameter keys
+const GA4_PARAM_KEYS = ["measurementId", "sendPageView"];
 
 /**
  * Merges incoming partial tag fields into the existing tag.
@@ -41,11 +37,10 @@ function mergeTag(
 
   // Merge all fields from partial into merged, overwriting existing values
   for (const key in partial) {
-    if (hasOwn(partial, key)) {
+    if (Object.hasOwn(partial, key)) {
       const value = partial[key as keyof Schema$Tag];
       if (value !== undefined) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (merged as any)[key] = value;
+        (merged as Record<string, unknown>)[key] = value;
       }
     }
   }
@@ -60,8 +55,8 @@ function mergeTag(
 function ensureMinimalIntegrity(tag: Schema$Tag): void {
   // If tag has parameters that indicate it's a GA4 config but no type, set it
   if (!tag.type && tag.parameter) {
-    const hasGA4Params = tag.parameter.some(
-      (p) => p.key === "measurementId" || p.key === "sendPageView",
+    const hasGA4Params = tag.parameter.some((p) =>
+      GA4_PARAM_KEYS.includes(p.key ?? ""),
     );
     if (hasGA4Params) {
       tag.type = "gaawc";
@@ -248,8 +243,8 @@ export const tagActions = (
             // Handle fingerprint: use provided fingerprint, or fall back to existing tag's fingerprint
             if (fingerprint) {
               mergedTag.fingerprint = fingerprint;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } else if ((createOrUpdateConfig as any).fingerprint) {
+              // Note: PayloadSchema omits fingerprint, so we need to cast to any to access it
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               mergedTag.fingerprint = (createOrUpdateConfig as any).fingerprint;
             } else if (existingTag.fingerprint) {
