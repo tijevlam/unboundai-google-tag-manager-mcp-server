@@ -42,10 +42,15 @@ export async function getTagManagerClient(): Promise<TagManagerClient> {
     debug("Getting Tag Manager client...");
     const auth = getAuthClient();
 
+    // Get the actual auth client which handles automatic token refresh
+    debug("Getting authenticated client with auto-refresh capability...");
+    const authClient = await auth.getClient();
+    debug("Authenticated client obtained");
+
     debug("Creating Tag Manager API client (v2)...");
     const client = google.tagmanager({
       version: "v2",
-      auth: auth as any,
+      auth: authClient as any,
     });
 
     debug("Tag Manager client created successfully");
